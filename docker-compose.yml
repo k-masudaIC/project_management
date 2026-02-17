@@ -1,0 +1,43 @@
+services:
+  app:
+    build: .
+    image: laravel-app
+    container_name: laravel-app
+    restart: unless-stopped
+    working_dir: /var/www
+    volumes:
+      - ./:/var/www
+    ports:
+      - "8000:8000"
+    environment:
+      - TZ=Asia/Tokyo
+    depends_on:
+      - db
+    command: bash -c "cd src && php artisan serve --host=0.0.0.0 --port=8000"
+  db:
+    image: mysql:8.0
+    container_name: laravel-db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: laravel
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: laravel
+      MYSQL_PASSWORD: secret
+      TZ: Asia/Tokyo
+    ports:
+      - "3306:3306"
+    volumes:
+      - db-data:/var/lib/mysql
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: laravel-phpmyadmin
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "8080:80"
+    depends_on:
+      - db
+volumes:
+  db-data:
