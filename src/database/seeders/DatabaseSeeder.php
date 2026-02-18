@@ -1,6 +1,9 @@
 <?php
 
+
 namespace Database\Seeders;
+
+use Illuminate\Support\Facades\Hash;
 
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -18,17 +21,24 @@ class DatabaseSeeder extends Seeder
             'name' => 'Test User',
             'email' => 'test@example.com',
             'role' => 'admin',
+            'password' => Hash::make('password'),
         ]);
         \App\Models\User::factory(5)->create();
 
         // クライアント
-        \App\Models\Client::factory(5)->create();
+        \App\Models\Client::factory(10)->create();
 
-        // 案件（projects）
-        \App\Models\Project::factory(20)->create();
+        // プロジェクト（projects）
+        \App\Models\Project::factory(30)->create();
 
         // タスク（tasks）
-        $this->call(TaskSeeder::class);
+        \App\Models\Project::all()->each(function ($project) {
+            \App\Models\Task::factory(8)->create([
+                'project_id' => $project->id,
+                'created_by' => \App\Models\User::inRandomOrder()->first()->id,
+            ]);
+        });
+
         $this->call(TaskAssignmentSeeder::class);
     }
 }
