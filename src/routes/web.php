@@ -33,10 +33,17 @@ Route::resource('tasks', App\Http\Controllers\TaskController::class);
 
 use App\Http\Controllers\TaskAssignmentController;
 
+use App\Http\Controllers\TimeEntryController;
+
 // タスク担当者アサイン
 Route::middleware('auth')->group(function () {
     Route::post('/task-assignments', [TaskAssignmentController::class, 'store'])->name('task-assignments.store');
     Route::delete('/task-assignments/{taskAssignment}', [TaskAssignmentController::class, 'destroy'])->name('task-assignments.destroy');
+});
+
+// 工数記録（TimeEntry）
+Route::middleware('auth')->group(function () {
+    Route::resource('time-entries', TimeEntryController::class);
 });
 
 require __DIR__.'/auth.php';
