@@ -6,9 +6,12 @@ use App\Models\TimeEntry;
 use App\Http\Requests\StoreTimeEntryRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+
 
 class TimeEntryController extends Controller
 {
+    use AuthorizesRequests;
     public function index(Request $request)
     {
         $this->authorize('viewAny', TimeEntry::class);
