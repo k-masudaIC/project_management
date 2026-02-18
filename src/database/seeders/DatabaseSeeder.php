@@ -26,5 +26,8 @@ class DatabaseSeeder extends Seeder
 
         // 案件（projects）
         \App\Models\Project::factory(20)->create();
+
+        // タスク（tasks）
+        $this->call(TaskSeeder::class);
     }
 }
