@@ -30,4 +30,13 @@ Route::resource('projects', ProjectController::class);
 // タスク管理（一覧・詳細は誰でも可、登録・編集・削除は認証ユーザーのみ）
 Route::resource('tasks', App\Http\Controllers\TaskController::class);
 
+
+use App\Http\Controllers\TaskAssignmentController;
+
+// タスク担当者アサイン
+Route::middleware('auth')->group(function () {
+    Route::post('/task-assignments', [TaskAssignmentController::class, 'store'])->name('task-assignments.store');
+    Route::delete('/task-assignments/{taskAssignment}', [TaskAssignmentController::class, 'destroy'])->name('task-assignments.destroy');
+});
+
 require __DIR__.'/auth.php';
