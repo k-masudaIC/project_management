@@ -19,6 +19,9 @@ class TimeEntryController extends Controller
         if ($request->has('task_id')) {
             $query->where('task_id', $request->task_id);
         }
+        if ($request->has('work_date')) {
+            $query->where('work_date', $request->work_date);
+        }
         $timeEntries = $query->orderByDesc('work_date')->paginate(20);
         return view('time-entries.index', compact('timeEntries'));
     }

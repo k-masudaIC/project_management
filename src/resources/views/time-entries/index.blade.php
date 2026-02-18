@@ -3,7 +3,16 @@
 @section('content')
 <div class="container mx-auto">
     <h1 class="text-2xl font-bold mb-4">工数記録一覧</h1>
-    <a href="{{ route('time-entries.create') }}" class="bg-blue-500 text-white px-4 py-2 rounded mb-4 inline-block">新規登録</a>
+    <div class="flex items-center mb-4 gap-2">
+        <a href="{{ route('time-entries.create') }}" class="bg-blue-500 text-white px-4 py-2 rounded inline-block">新規登録</a>
+        <a href="{{ route('time-entries.daily') }}" class="bg-yellow-500 text-white px-4 py-2 rounded inline-block">日次入力</a>
+        <form method="GET" action="" class="flex gap-2 items-center ml-auto">
+            <input type="date" name="work_date" value="{{ request('work_date') }}" class="border rounded px-2 py-1" placeholder="日付">
+            <input type="text" name="user_id" value="{{ request('user_id') }}" class="border rounded px-2 py-1" placeholder="ユーザーID">
+            <input type="text" name="task_id" value="{{ request('task_id') }}" class="border rounded px-2 py-1" placeholder="タスクID">
+            <button type="submit" class="bg-gray-400 text-white px-2 py-1 rounded">絞り込み</button>
+        </form>
+    </div>
     <table class="min-w-full bg-white border">
         <thead>
             <tr>
