@@ -89,4 +89,31 @@ class TimeEntryController extends Controller
         }
         return redirect()->route('time-entries.daily')->with('success', '日次工数を登録しました');
     }
+    /**
+     * 工数集計（ユーザー別・案件別・日別）
+     */
+    public function summary(Request $request)
+    {
+        $this->authorize('viewAny', TimeEntry::class);
+        $query = \App\Models\TimeEntry::query();
+        if ($request->has('user_id')) {
+            $query->where('user_id', $request->user_id);
+        }
+        if ($request->has('project_id')) {
+            $query->whereHas('task', function ($q) use ($request) {
+                $q->where('project_id', $request->project_id);
+            });
+        }
+        if ($request->has('from')) {
+            $query->where('work_date', '>=', $request->from);
+        }
+        if ($request->has('to')) {
+            $query->where('work_date', '<=', $request->to);
+        }
+        $summary = $query->with(['user', 'task.project'])
+            ->selectRaw('user_id, SUM(hours) as total_hours')
+            ->groupBy('user_id')
+            ->get();
+        return view('time-entries.summary', compact('summary'));
+    }
 }

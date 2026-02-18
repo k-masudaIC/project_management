@@ -27,7 +27,8 @@ Route::middleware('auth')->get('/time-entries/daily', function () {
 
 // 日次工数入力登録
 Route::middleware('auth')->post('/time-entries/daily', [TimeEntryController::class, 'storeDaily'])->name('time-entries.daily.store');
-
+// 工数集計画面
+Route::middleware('auth')->get('/time-entries/summary', [TimeEntryController::class, 'summary'])->name('time-entries.summary');
 
 Route::get('/', function () {
     return view('welcome');
