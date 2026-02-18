@@ -15,7 +15,9 @@ class ProjectController extends Controller
     
     public function __construct()
     {
-        $this->authorizeResource(Project::class, 'project');
+        if (auth()->check()) {
+            $this->authorizeResource(Project::class, 'project');
+        }
     }
 
     public function index(Request $request)

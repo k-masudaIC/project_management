@@ -18,7 +18,9 @@
             @endforeach
         </select>
         <button type="submit" class="bg-blue-500 text-white px-4 py-1 rounded">絞り込み</button>
+        @auth
         <a href="{{ route('projects.create') }}" class="ml-auto bg-green-500 text-white px-4 py-1 rounded">新規登録</a>
+        @endauth
     </form>
     <table class="min-w-full bg-white border">
         <thead>
@@ -43,11 +45,13 @@
                 <td class="border px-2 py-1">{{ $project->end_date }}</td>
                 <td class="border px-2 py-1">
                     <a href="{{ route('projects.show', $project) }}" class="text-blue-600 underline">詳細</a>
+                    @auth
                     <a href="{{ route('projects.edit', $project) }}" class="text-green-600 underline ml-2">編集</a>
                     <form action="{{ route('projects.destroy', $project) }}" method="POST" class="inline">
                         @csrf @method('DELETE')
                         <button type="submit" class="text-red-600 underline ml-2" onclick="return confirm('削除しますか？')">削除</button>
                     </form>
+                    @endauth
                 </td>
             </tr>
             @endforeach

@@ -22,7 +22,9 @@ Route::middleware('auth')->group(function () {
 // クライアント管理
 Route::middleware('auth')->group(function () {
     Route::resource('clients', ClientController::class);
-    Route::resource('projects', ProjectController::class);
 });
+
+// 案件管理（一覧・詳細は誰でも可、登録・編集・削除は認証ユーザーのみ）
+Route::resource('projects', ProjectController::class);
 
 require __DIR__.'/auth.php';

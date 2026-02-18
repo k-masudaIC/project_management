@@ -6,11 +6,11 @@ use App\Models\User;
 
 class ProjectPolicy
 {
-    public function viewAny(User $user)
+    public function viewAny($user = null)
     {
         return true;
     }
-    public function view(User $user, Project $project)
+    public function view($user = null, Project $project = null)
     {
         return true;
     }
