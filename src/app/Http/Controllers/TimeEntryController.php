@@ -63,4 +63,27 @@ class TimeEntryController extends Controller
         $timeEntry->delete();
         return redirect()->route('time-entries.index')->with('success', '工数記録を削除しました');
     }
+    public function storeDaily(Request $request)
+    {
+        $this->authorize('create', TimeEntry::class);
+        $request->validate([
+            'work_date' => ['required', 'date'],
+            'tasks' => ['required', 'array'],
+            'tasks.*.task_id' => ['required', 'exists:tasks,id'],
+            'tasks.*.hours' => ['required', 'numeric', 'min:0.01', 'max:24'],
+            'tasks.*.description' => ['nullable', 'string'],
+        ]);
+        $userId = \Auth::id();
+        foreach ($request->tasks as $task) {
+            TimeEntry::updateOrCreate([
+                'task_id' => $task['task_id'],
+                'user_id' => $userId,
+                'work_date' => $request->work_date,
+            ], [
+                'hours' => $task['hours'],
+                'description' => $task['description'] ?? null,
+            ]);
+        }
+        return redirect()->route('time-entries.daily')->with('success', '日次工数を登録しました');
+    }
 }

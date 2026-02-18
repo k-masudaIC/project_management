@@ -20,6 +20,15 @@ Route::middleware('auth')->group(function () {
     Route::post('/timer/stop/{timeEntry}', [TimerController::class, 'stop'])->name('timer.stop');
 });
 
+// 日次工数入力画面
+Route::middleware('auth')->get('/time-entries/daily', function () {
+    return view('time-entries.daily');
+})->name('time-entries.daily');
+
+// 日次工数入力登録
+Route::middleware('auth')->post('/time-entries/daily', [TimeEntryController::class, 'storeDaily'])->name('time-entries.daily.store');
+
+
 Route::get('/', function () {
     return view('welcome');
 });
