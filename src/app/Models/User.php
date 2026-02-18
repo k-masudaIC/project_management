@@ -49,4 +49,9 @@ class User extends Authenticatable
             'role' => 'string',
         ];
     }
+
+    public function taskAssignments()
+    {
+        return $this->hasMany(TaskAssignment::class);
+    }
 }

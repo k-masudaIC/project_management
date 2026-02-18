@@ -13,6 +13,7 @@
             <dt>期限</dt><dd>{{ $task->due_date }}</dd>
             <dt>説明</dt><dd class="col-span-2">{{ $task->description }}</dd>
         </dl>
+        <x-task-assignees :task="$task" :users="$users" />
         <div class="mt-4">
             @auth
             <a href="{{ route('tasks.edit', $task) }}" class="bg-green-500 text-white px-4 py-1 rounded">編集</a>

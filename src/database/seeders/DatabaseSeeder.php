@@ -29,5 +29,6 @@ class DatabaseSeeder extends Seeder
 
         // タスク（tasks）
         $this->call(TaskSeeder::class);
+        $this->call(TaskAssignmentSeeder::class);
     }
 }

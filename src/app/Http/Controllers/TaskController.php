@@ -53,8 +53,9 @@ class TaskController extends Controller
 
     public function show(Task $task)
     {
-        $task->load(['project', 'creator']);
-        return view('tasks.show', compact('task'));
+        $task->load(['project', 'creator', 'assignments.user']);
+        $users = \App\Models\User::where('is_active', true)->get();
+        return view('tasks.show', compact('task', 'users'));
     }
 
     public function edit(Task $task)
