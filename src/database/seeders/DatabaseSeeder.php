@@ -40,5 +40,6 @@ class DatabaseSeeder extends Seeder
         });
 
         $this->call(TaskAssignmentSeeder::class);
+        $this->call(TimeEntrySeeder::class);
     }
 }
