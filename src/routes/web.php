@@ -45,6 +45,8 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::resource('clients', ClientController::class);
+    // ユーザー管理（管理者のみアクセス可などの制御はコントローラー/ポリシーで実施）
+    Route::resource('users', UserController::class);
     // タスク担当者アサイン
     Route::post('/task-assignments', [TaskAssignmentController::class, 'store'])->name('task-assignments.store');
     Route::delete('/task-assignments/{taskAssignment}', [TaskAssignmentController::class, 'destroy'])->name('task-assignments.destroy');
