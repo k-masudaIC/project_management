@@ -7,6 +7,7 @@ use App\Http\Requests\StoreTaskRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Support\Facades\Log;
 
 class TaskController extends Controller
 {
@@ -45,10 +46,11 @@ class TaskController extends Controller
                 $data['created_by'] = auth()->id() ?? 1;
                 Task::create($data);
             });
+            return redirect()->route('tasks.index')->with('success', 'タスクを登録しました');
         } catch (\Exception $e) {
+            Log::error('Task create failed: ' . $e->getMessage(), ['exception' => $e]);
             return back()->withErrors(['error' => 'タスクの作成に失敗しました。']);
         }
-        return redirect()->route('tasks.index')->with('success', 'タスクを登録しました');
     }
 
     public function show(Task $task)
@@ -70,15 +72,21 @@ class TaskController extends Controller
             DB::transaction(function () use ($request, $task) {
                 $task->update($request->validated());
             });
+            return redirect()->route('tasks.index')->with('success', 'タスク情報を更新しました');
         } catch (\Exception $e) {
+            Log::error('Task update failed: ' . $e->getMessage(), ['exception' => $e]);
             return back()->withErrors(['error' => 'タスクの更新に失敗しました。']);
         }
-        return redirect()->route('tasks.index')->with('success', 'タスク情報を更新しました');
     }
 
     public function destroy(Task $task)
     {
-        $task->delete();
-        return redirect()->route('tasks.index')->with('success', 'タスクを削除しました');
+        try {
+            $task->delete();
+            return redirect()->route('tasks.index')->with('success', 'タスクを削除しました');
+        } catch (\Exception $e) {
+            Log::error('Task delete failed: ' . $e->getMessage(), ['exception' => $e]);
+            return back()->withErrors(['error' => 'タスクの削除に失敗しました。']);
+        }
     }
 }

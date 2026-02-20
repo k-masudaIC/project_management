@@ -22,22 +22,23 @@
         <a href="{{ route('projects.create') }}" class="ml-auto bg-green-500 text-white px-4 py-1 rounded">新規登録</a>
         @endauth
     </form>
-    <table class="min-w-full bg-white border">
-        <thead>
-            <tr>
-                <th class="border px-2 py-1">案件コード</th>
-                <th class="border px-2 py-1">案件名</th>
-                <th class="border px-2 py-1">クライアント名</th>
-                <th class="border px-2 py-1">ステータス</th>
-                <th class="border px-2 py-1">予算</th>
-                <th class="border px-2 py-1">納期</th>
-                <th class="border px-2 py-1">操作</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach($projects as $project)
-            <tr>
-                <td class="border px-2 py-1">{{ $project->code }}</td>
+    <div class="overflow-x-auto">
+        <table class="min-w-full bg-white border">
+            <thead>
+                <tr>
+                    <th class="border px-2 py-1">案件コード</th>
+                    <th class="border px-2 py-1">案件名</th>
+                    <th class="border px-2 py-1">クライアント名</th>
+                    <th class="border px-2 py-1">ステータス</th>
+                    <th class="border px-2 py-1">予算</th>
+                    <th class="border px-2 py-1">納期</th>
+                    <th class="border px-2 py-1">操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($projects as $project)
+                <tr>
+                    <td class="border px-2 py-1">{{ $project->code }}</td>
                 <td class="border px-2 py-1">{{ $project->name }}</td>
                 <td class="border px-2 py-1">{{ $project->client->company_name ?? '' }}</td>
                 <td class="border px-2 py-1">{{ $project->status }}</td>

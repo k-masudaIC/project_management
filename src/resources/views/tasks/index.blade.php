@@ -22,22 +22,23 @@
         <a href="{{ route('tasks.create') }}" class="ml-auto bg-green-500 text-white px-4 py-1 rounded">新規登録</a>
         @endauth
     </form>
-    <table class="min-w-full bg-white border">
-        <thead>
-            <tr>
-                <th class="border px-2 py-1">案件</th>
-                <th class="border px-2 py-1">タスク名</th>
-                <th class="border px-2 py-1">ステータス</th>
-                <th class="border px-2 py-1">優先度</th>
-                <th class="border px-2 py-1">見積工数</th>
-                <th class="border px-2 py-1">期限</th>
-                <th class="border px-2 py-1">操作</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach($tasks as $task)
-            <tr>
-                <td class="border px-2 py-1">{{ $task->project->name ?? '' }}</td>
+    <div class="overflow-x-auto">
+        <table class="min-w-full bg-white border">
+            <thead>
+                <tr>
+                    <th class="border px-2 py-1">案件</th>
+                    <th class="border px-2 py-1">タスク名</th>
+                    <th class="border px-2 py-1">ステータス</th>
+                    <th class="border px-2 py-1">優先度</th>
+                    <th class="border px-2 py-1">見積工数</th>
+                    <th class="border px-2 py-1">期限</th>
+                    <th class="border px-2 py-1">操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($tasks as $task)
+                <tr>
+                    <td class="border px-2 py-1">{{ $task->project->name ?? '' }}</td>
                 <td class="border px-2 py-1">{{ $task->title }}</td>
                 <td class="border px-2 py-1">{{ $task->status }}</td>
                 <td class="border px-2 py-1">{{ $task->priority }}</td>
