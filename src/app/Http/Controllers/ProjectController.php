@@ -7,6 +7,7 @@ use App\Http\Requests\StoreProjectRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Support\Facades\Log;
 
 
 class ProjectController extends Controller
@@ -48,10 +49,11 @@ class ProjectController extends Controller
                 $data['created_by'] = auth()->id() ?? 1; // 認証なし時は仮で1
                 Project::create($data);
             });
+            return redirect()->route('projects.index')->with('success', '案件を登録しました');
         } catch (\Exception $e) {
+            Log::error('Project create failed: ' . $e->getMessage(), ['exception' => $e]);
             return back()->withErrors(['error' => '案件の作成に失敗しました。']);
         }
-        return redirect()->route('projects.index')->with('success', '案件を登録しました');
     }
 
     public function show(Project $project)
@@ -72,15 +74,21 @@ class ProjectController extends Controller
             DB::transaction(function () use ($request, $project) {
                 $project->update($request->validated());
             });
+            return redirect()->route('projects.index')->with('success', '案件情報を更新しました');
         } catch (\Exception $e) {
+            Log::error('Project update failed: ' . $e->getMessage(), ['exception' => $e]);
             return back()->withErrors(['error' => '案件の更新に失敗しました。']);
         }
-        return redirect()->route('projects.index')->with('success', '案件情報を更新しました');
     }
 
     public function destroy(Project $project)
     {
-        $project->delete();
-        return redirect()->route('projects.index')->with('success', '案件を削除しました');
+        try {
+            $project->delete();
+            return redirect()->route('projects.index')->with('success', '案件を削除しました');
+        } catch (\Exception $e) {
+            Log::error('Project delete failed: ' . $e->getMessage(), ['exception' => $e]);
+            return back()->withErrors(['error' => '案件の削除に失敗しました。']);
+        }
     }
 }

@@ -3,17 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Models\TimeEntry;
+use App\Http\Requests\StartTimerRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 
 class TimerController extends Controller
 {
-    public function start(Request $request)
+    public function start(StartTimerRequest $request)
     {
-        $request->validate([
-            'task_id' => ['required', 'exists:tasks,id'],
-        ]);
         $entry = TimeEntry::create([
             'task_id' => $request->task_id,
             'user_id' => Auth::id(),

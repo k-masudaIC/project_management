@@ -13,20 +13,21 @@
             <button type="submit" class="bg-gray-400 text-white px-2 py-1 rounded">絞り込み</button>
         </form>
     </div>
-    <table class="min-w-full bg-white border">
-        <thead>
-            <tr>
-                <th class="px-4 py-2">日付</th>
-                <th class="px-4 py-2">タスク</th>
-                <th class="px-4 py-2">ユーザー</th>
-                <th class="px-4 py-2">作業時間</th>
-                <th class="px-4 py-2">操作</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach ($timeEntries as $entry)
-            <tr>
-                <td class="border px-4 py-2">{{ $entry->work_date }}</td>
+    <div class="overflow-x-auto">
+        <table class="min-w-full bg-white border">
+            <thead>
+                <tr>
+                    <th class="px-4 py-2">日付</th>
+                    <th class="px-4 py-2">タスク</th>
+                    <th class="px-4 py-2">ユーザー</th>
+                    <th class="px-4 py-2">作業時間</th>
+                    <th class="px-4 py-2">操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach ($timeEntries as $entry)
+                <tr>
+                    <td class="border px-4 py-2">{{ $entry->work_date }}</td>
                 <td class="border px-4 py-2">{{ $entry->task->title ?? '-' }}</td>
                 <td class="border px-4 py-2">{{ $entry->user->name ?? '-' }}</td>
                 <td class="border px-4 py-2">{{ $entry->hours }} h</td>

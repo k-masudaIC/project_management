@@ -5,9 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\TimeEntry;
 use App\Http\Requests\StoreTimeEntryRequest;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 
 class TimeEntryController extends Controller
 {
@@ -38,10 +38,15 @@ class TimeEntryController extends Controller
     public function store(StoreTimeEntryRequest $request)
     {
         $this->authorize('create', TimeEntry::class);
-        $data = $request->validated();
-        $data['user_id'] = Auth::id();
-        $timeEntry = TimeEntry::create($data);
-        return redirect()->route('time-entries.index')->with('success', '工数記録を登録しました');
+        try {
+            $data = $request->validated();
+            $data['user_id'] = Auth::id();
+            $timeEntry = TimeEntry::create($data);
+            return redirect()->route('time-entries.index')->with('success', '工数記録を登録しました');
+        } catch (\Exception $e) {
+            Log::error('TimeEntry create failed: ' . $e->getMessage(), ['exception' => $e]);
+            return back()->withErrors(['error' => '工数記録の登録に失敗しました。']);
+        }
     }
 
     public function show(TimeEntry $timeEntry)
@@ -59,38 +64,46 @@ class TimeEntryController extends Controller
     public function update(StoreTimeEntryRequest $request, TimeEntry $timeEntry)
     {
         $this->authorize('update', $timeEntry);
-        $timeEntry->update($request->validated());
-        return redirect()->route('time-entries.index')->with('success', '工数記録を更新しました');
+        try {
+            $timeEntry->update($request->validated());
+            return redirect()->route('time-entries.index')->with('success', '工数記録を更新しました');
+        } catch (\Exception $e) {
+            Log::error('TimeEntry update failed: ' . $e->getMessage(), ['exception' => $e]);
+            return back()->withErrors(['error' => '工数記録の更新に失敗しました。']);
+        }
     }
 
     public function destroy(TimeEntry $timeEntry)
     {
         $this->authorize('delete', $timeEntry);
-        $timeEntry->delete();
-        return redirect()->route('time-entries.index')->with('success', '工数記録を削除しました');
+        try {
+            $timeEntry->delete();
+            return redirect()->route('time-entries.index')->with('success', '工数記録を削除しました');
+        } catch (\Exception $e) {
+            Log::error('TimeEntry delete failed: ' . $e->getMessage(), ['exception' => $e]);
+            return back()->withErrors(['error' => '工数記録の削除に失敗しました。']);
+        }
     }
-    public function storeDaily(Request $request)
+    public function storeDaily(\App\Http\Requests\StoreDailyTimeEntryRequest $request)
     {
         $this->authorize('create', TimeEntry::class);
-        $request->validate([
-            'work_date' => ['required', 'date'],
-            'tasks' => ['required', 'array'],
-            'tasks.*.task_id' => ['required', 'exists:tasks,id'],
-            'tasks.*.hours' => ['required', 'numeric', 'min:0.01', 'max:24'],
-            'tasks.*.description' => ['nullable', 'string'],
-        ]);
-        $userId = \Auth::id();
-        foreach ($request->tasks as $task) {
-            TimeEntry::updateOrCreate([
-                'task_id' => $task['task_id'],
-                'user_id' => $userId,
-                'work_date' => $request->work_date,
-            ], [
-                'hours' => $task['hours'],
-                'description' => $task['description'] ?? null,
-            ]);
+        try {
+            $userId = Auth::id();
+            foreach ($request->tasks as $task) {
+                TimeEntry::updateOrCreate([
+                    'task_id' => $task['task_id'],
+                    'user_id' => $userId,
+                    'work_date' => $request->work_date,
+                ], [
+                    'hours' => $task['hours'],
+                    'description' => $task['description'] ?? null,
+                ]);
+            }
+            return redirect()->route('time-entries.daily')->with('success', '日次工数を登録しました');
+        } catch (\Exception $e) {
+            Log::error('TimeEntry daily create failed: ' . $e->getMessage(), ['exception' => $e]);
+            return back()->withErrors(['error' => '日次工数の登録に失敗しました。']);
         }
-        return redirect()->route('time-entries.daily')->with('success', '日次工数を登録しました');
     }
     /**
      * 工数集計（ユーザー別・案件別・日別）
