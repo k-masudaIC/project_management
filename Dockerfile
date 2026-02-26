@@ -1,5 +1,9 @@
 FROM php:8.4-fpm
 
+# Node.js（npm含む）インストール
+RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
+    && apt-get install -y nodejs
+
 # 必要なパッケージのインストール
 RUN apt-get update && apt-get install -y \
     libpng-dev \
