@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\ProjectController;
@@ -63,8 +64,17 @@ require __DIR__.'/auth.php';
 // レポート機能
 use App\Http\Controllers\ReportController;
 Route::middleware(['auth'])->prefix('reports')->name('reports.')->group(function () {
+    // 目次ページ
+    Route::get('/', function () {
+        return view('reports.index');
+    })->name('index');
     Route::get('/monthly', [ReportController::class, 'monthly'])->name('monthly');
     Route::get('/project', [ReportController::class, 'project'])->name('project');
     Route::get('/member', [ReportController::class, 'member'])->name('member');
     Route::get('/export', [ReportController::class, 'export'])->name('export');
 });
+
+// 設定メニュー
+Route::middleware(['auth'])->get('/settings', function () {
+    return view('settings.index');
+})->name('settings.index');
