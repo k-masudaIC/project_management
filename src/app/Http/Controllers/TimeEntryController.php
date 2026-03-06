@@ -16,8 +16,16 @@ class TimeEntryController extends Controller
     {
         $this->authorize('viewAny', TimeEntry::class);
         $query = TimeEntry::with(['task', 'user']);
-        if ($request->has('user_id')) {
-            $query->where('user_id', $request->user_id);
+        $userId = $request->user_id;
+        // ユーザー名での絞り込み対応
+        if (!$userId && $request->filled('user_name')) {
+            $user = \App\Models\User::where('name', $request->user_name)->first();
+            if ($user) {
+                $userId = $user->id;
+            }
+        }
+        if ($userId) {
+            $query->where('user_id', $userId);
         }
         if ($request->has('task_id')) {
             $query->where('task_id', $request->task_id);
@@ -29,10 +37,27 @@ class TimeEntryController extends Controller
         return view('time-entries.index', compact('timeEntries'));
     }
 
-    public function create()
+
+    public function daily(Request $request)
     {
         $this->authorize('create', TimeEntry::class);
-        return view('time-entries.create');
+        $userId = Auth::id();
+        $date = $request->input('work_date', date('Y-m-d'));
+        $entries = \App\Models\TimeEntry::where('user_id', $userId)
+            ->where('work_date', $date)
+            ->get();
+        $tasks = \App\Models\Task::with(['assignments.user', 'project'])->get();
+        return view('time-entries.daily', [
+            'entries' => $entries,
+            'work_date' => $date,
+            'tasks' => $tasks,
+        ]);
+    }
+
+    public function create()
+    {
+        $this->authorize("create", TimeEntry::class);
+        return view("time-entries.create");
     }
 
     public function store(StoreTimeEntryRequest $request)

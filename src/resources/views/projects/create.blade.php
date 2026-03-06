@@ -3,14 +3,28 @@
 <div class="container mx-auto py-6">
     <h1 class="text-2xl font-bold mb-4">案件新規登録</h1>
     <form method="POST" action="{{ route('projects.store') }}" class="space-y-4">
+        @if(session('success'))
+            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-2 rounded mb-4">
+                {{ session('success') }}
+            </div>
+        @endif
+        @if($errors->any())
+            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded mb-4">
+                <ul class="list-disc pl-5">
+                    @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
         @csrf
         <div>
             <label>案件名</label>
-            <input type="text" name="name" class="border rounded px-2 py-1 w-full" required>
+            <input type="text" name="name" class="border rounded px-2 py-1 w-full" required placeholder="例：新規Webサイト開発">
         </div>
         <div>
             <label>案件コード</label>
-            <input type="text" name="code" class="border rounded px-2 py-1 w-full">
+            <input type="text" name="code" class="border rounded px-2 py-1 w-full" placeholder="例：PRJ-2026-001">
         </div>
         <div>
             <label>クライアント</label>
@@ -33,11 +47,11 @@
         </div>
         <div>
             <label>予算（円）</label>
-            <input type="number" name="budget" class="border rounded px-2 py-1 w-full" step="0.01">
+            <input type="number" name="budget" class="border rounded px-2 py-1 w-full" step="0.01" placeholder="例：1000000">
         </div>
         <div>
             <label>見積工数（時間）</label>
-            <input type="number" name="estimated_hours" class="border rounded px-2 py-1 w-full" step="0.01">
+            <input type="number" name="estimated_hours" class="border rounded px-2 py-1 w-full" step="0.01" placeholder="例：120">
         </div>
         <div>
             <label>開始日</label>
@@ -49,7 +63,7 @@
         </div>
         <div>
             <label>説明</label>
-            <textarea name="description" class="border rounded px-2 py-1 w-full"></textarea>
+            <textarea name="description" class="border rounded px-2 py-1 w-full" placeholder="案件の概要や注意点など"></textarea>
         </div>
         <div>
             <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">登録</button>

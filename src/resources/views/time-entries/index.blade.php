@@ -8,9 +8,40 @@
         <a href="{{ route('time-entries.daily') }}" class="bg-yellow-500 text-white px-4 py-2 rounded inline-block">日次入力</a>
         <form method="GET" action="" class="flex gap-2 items-center ml-auto">
             <input type="date" name="work_date" value="{{ request('work_date') }}" class="border rounded px-2 py-1" placeholder="日付">
-            <input type="text" name="user_id" value="{{ request('user_id') }}" class="border rounded px-2 py-1" placeholder="ユーザーID">
+            @php
+                $users = \App\Models\User::where('is_active', true)->get();
+                $userName = '';
+                if(request('user_id')) {
+                    $u = $users->firstWhere('id', request('user_id'));
+                    if($u) $userName = $u->name;
+                }
+            @endphp
+            <input type="text" id="user_name_input" name="user_name" value="{{ request('user_name', $userName) }}" class="border rounded px-2 py-1" placeholder="ユーザー名" list="user_name_list">
+            <datalist id="user_name_list">
+                @foreach($users as $user)
+                    <option value="{{ $user->name }}">
+                @endforeach
+            </datalist>
+            <input type="hidden" name="user_id" id="user_id_hidden" value="{{ request('user_id') }}">
             <input type="text" name="task_id" value="{{ request('task_id') }}" class="border rounded px-2 py-1" placeholder="タスクID">
             <button type="submit" class="bg-gray-400 text-white px-2 py-1 rounded">絞り込み</button>
+            <script src="/resources/js/user_suggest.js"></script>
+            <script>
+            // ユーザー名→ID変換
+            document.addEventListener('DOMContentLoaded', function() {
+                const userInput = document.getElementById('user_name_input');
+                const userIdHidden = document.getElementById('user_id_hidden');
+                const userList = [
+                    @foreach($users as $user)
+                        {id: {{ $user->id }}, name: "{{ $user->name }}"},
+                    @endforeach
+                ];
+                userInput && userInput.addEventListener('change', function() {
+                    const found = userList.find(u => u.name === userInput.value);
+                    userIdHidden.value = found ? found.id : '';
+                });
+            });
+            </script>
         </form>
     </div>
     <div class="overflow-x-auto">

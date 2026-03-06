@@ -34,4 +34,32 @@ class Task extends Model
     {
         return $this->hasMany(TimeEntry::class);
     }
+
+    /**
+     * ステータスの日本語表示
+     */
+    public function getStatusLabelAttribute()
+    {
+        return match($this->status) {
+            'not_started' => '未着手',
+            'in_progress' => '進行中',
+            'in_review' => 'レビュー待ち',
+            'completed' => '完了',
+            'on_hold' => '保留',
+            default => $this->status,
+        };
+    }
+
+    /**
+     * 優先度の日本語表示
+     */
+    public function getPriorityLabelAttribute()
+    {
+        return match($this->priority) {
+            'low' => '低',
+            'medium' => '中',
+            'high' => '高',
+            default => $this->priority,
+        };
+    }
 }

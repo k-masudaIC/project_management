@@ -3,6 +3,10 @@
 <div class="container mx-auto py-6">
     <h1 class="text-2xl font-bold mb-4">タスク編集</h1>
     <form method="POST" action="{{ route('tasks.update', $task) }}" class="space-y-4">
+        <div>
+            <label>タスクID</label>
+            <input type="text" class="border rounded px-2 py-1 w-full bg-gray-100" value="{{ $task->id }}" readonly>
+        </div>
         @csrf
         @method('PUT')
         <div>
@@ -51,6 +55,18 @@
         <div>
             <label>期限</label>
             <input type="date" name="due_date" class="border rounded px-2 py-1 w-full" value="{{ old('due_date', $task->due_date) }}">
+        </div>
+        <div>
+            <label>担当者（複数選択可）</label>
+            <div class="flex flex-wrap gap-4 mt-2">
+                @foreach($users as $user)
+                    <label class="flex items-center">
+                        <input type="checkbox" name="assignees[]" value="{{ $user->id }}" class="mr-1"
+                            @if($task->assignments->pluck('user_id')->contains($user->id)) checked @endif>
+                        {{ $user->name }}
+                    </label>
+                @endforeach
+            </div>
         </div>
         <div>
             <label>表示順</label>

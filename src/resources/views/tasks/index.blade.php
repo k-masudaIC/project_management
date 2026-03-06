@@ -26,6 +26,7 @@
         <table class="min-w-full bg-white border">
             <thead>
                 <tr>
+                    <th class="border px-2 py-1">ID</th>
                     <th class="border px-2 py-1">案件</th>
                     <th class="border px-2 py-1">タスク名</th>
                     <th class="border px-2 py-1">ステータス</th>
@@ -38,24 +39,25 @@
             <tbody>
                 @foreach($tasks as $task)
                 <tr>
+                    <td class="border px-2 py-1 text-right">{{ $task->id }}</td>
                     <td class="border px-2 py-1">{{ $task->project->name ?? '' }}</td>
-                <td class="border px-2 py-1">{{ $task->title }}</td>
-                <td class="border px-2 py-1">{{ $task->status }}</td>
-                <td class="border px-2 py-1">{{ $task->priority }}</td>
-                <td class="border px-2 py-1 text-right">{{ $task->estimated_hours }}</td>
-                <td class="border px-2 py-1">{{ $task->due_date }}</td>
-                <td class="border px-2 py-1">
-                    <a href="{{ route('tasks.show', $task) }}" class="text-blue-600 underline">詳細</a>
-                    @auth
-                    <a href="{{ route('tasks.edit', $task) }}" class="text-green-600 underline ml-2">編集</a>
-                    <form action="{{ route('tasks.destroy', $task) }}" method="POST" class="inline">
-                        @csrf @method('DELETE')
-                        <button type="submit" class="text-red-600 underline ml-2" onclick="return confirm('削除しますか？')">削除</button>
-                    </form>
-                    @endauth
-                </td>
-            </tr>
-            @endforeach
+                    <td class="border px-2 py-1">{{ $task->title }}</td>
+                    <td class="border px-2 py-1">{{ $task->status_label }}</td>
+                    <td class="border px-2 py-1">{{ $task->priority_label }}</td>
+                    <td class="border px-2 py-1 text-right">{{ $task->estimated_hours }}</td>
+                    <td class="border px-2 py-1">{{ $task->due_date }}</td>
+                    <td class="border px-2 py-1">
+                        <a href="{{ route('tasks.show', $task) }}" class="text-blue-600 underline">詳細</a>
+                        @auth
+                        <a href="{{ route('tasks.edit', $task) }}" class="text-green-600 underline ml-2">編集</a>
+                        <form action="{{ route('tasks.destroy', $task) }}" method="POST" class="inline">
+                            @csrf @method('DELETE')
+                            <button type="submit" class="text-red-600 underline ml-2" onclick="return confirm('削除しますか？')">削除</button>
+                        </form>
+                        @endauth
+                    </td>
+                </tr>
+                @endforeach
         </tbody>
     </table>
     <div class="mt-4">{{ $tasks->links() }}</div>

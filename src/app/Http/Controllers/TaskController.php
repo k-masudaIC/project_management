@@ -63,7 +63,9 @@ class TaskController extends Controller
     public function edit(Task $task)
     {
         $projects = Project::all();
-        return view('tasks.edit', compact('task', 'projects'));
+        $users = \App\Models\User::where('is_active', true)->get();
+        $task->load(['assignments.user']);
+        return view('tasks.edit', compact('task', 'projects', 'users'));
     }
 
     public function update(StoreTaskRequest $request, Task $task)
@@ -71,6 +73,15 @@ class TaskController extends Controller
         try {
             DB::transaction(function () use ($request, $task) {
                 $task->update($request->validated());
+
+                // 担当者（assignees）更新処理
+                $assignees = $request->input('assignees', []);
+                // 既存の担当者を全削除
+                $task->assignments()->delete();
+                // 新しい担当者を登録
+                foreach ($assignees as $userId) {
+                    $task->assignments()->create(['user_id' => $userId]);
+                }
             });
             return redirect()->route('tasks.index')->with('success', 'タスク情報を更新しました');
         } catch (\Exception $e) {
