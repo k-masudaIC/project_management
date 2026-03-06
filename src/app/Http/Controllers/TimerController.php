@@ -4,12 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Models\TimeEntry;
 use App\Http\Requests\StartTimerRequest;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 
 class TimerController extends Controller
 {
+    use AuthorizesRequests;
+
     public function start(StartTimerRequest $request)
     {
         $entry = TimeEntry::create([

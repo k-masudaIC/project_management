@@ -6,6 +6,7 @@
     <div class="flex items-center mb-4 gap-2">
         <a href="{{ route('time-entries.create') }}" class="bg-blue-500 text-white px-4 py-2 rounded inline-block">新規登録</a>
         <a href="{{ route('time-entries.daily') }}" class="bg-yellow-500 text-white px-4 py-2 rounded inline-block">日次入力</a>
+        <a href="{{ route('time-entries.timer') }}" class="bg-green-500 text-white px-4 py-2 rounded inline-block">タイマー入力</a>
         <form method="GET" action="" class="flex gap-2 items-center ml-auto">
             <input type="date" name="work_date" value="{{ request('work_date') }}" class="border rounded px-2 py-1" placeholder="日付">
             @php
