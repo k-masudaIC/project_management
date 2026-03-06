@@ -4,16 +4,15 @@ services:
     image: laravel-app
     container_name: laravel-app
     restart: unless-stopped
-    working_dir: /var/www
+    working_dir: /var/www/src
     volumes:
-      - ./:/var/www
+      - ./src:/var/www/src
     ports:
       - "8000:8000"
     environment:
       - TZ=Asia/Tokyo
     depends_on:
       - db
-    command: bash -c "cd src && php artisan serve --host=0.0.0.0 --port=8000"
   db:
     image: mysql:8.0
     container_name: laravel-db

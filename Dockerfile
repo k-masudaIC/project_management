@@ -1,10 +1,8 @@
 FROM php:8.4-fpm
 
-# Node.js（npm含む）インストール
 RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
     && apt-get install -y nodejs
 
-# 必要なパッケージのインストール
 RUN apt-get update && apt-get install -y \
     libpng-dev \
     libonig-dev \
@@ -15,15 +13,24 @@ RUN apt-get update && apt-get install -y \
     curl \
     && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
 
-# Composerインストール
 COPY --from=composer:2.5 /usr/bin/composer /usr/bin/composer
 
-WORKDIR /var/www/html
+WORKDIR /var/www/src
 
-COPY ./src /var/www/html
+COPY ./src/composer.json ./src/composer.lock ./
 
-# 権限設定
+ENV COMPOSER_ALLOW_SUPERUSER=1
+RUN composer install --no-scripts --no-autoloader
+
+COPY ./src .
+
+RUN composer dump-autoload --optimize --no-scripts \
+    && php artisan package:discover --ansi || true
+
 RUN chown -R www-data:www-data /var/www
 
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
 EXPOSE 9000
-CMD ["php-fpm"]
+ENTRYPOINT ["/entrypoint.sh"]
