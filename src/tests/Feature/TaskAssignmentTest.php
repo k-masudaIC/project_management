@@ -7,12 +7,12 @@ namespace Tests\Feature;
 use App\Models\Task;
 use App\Models\User;
 use App\Models\TaskAssignment;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
 
 class TaskAssignmentTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     public function test_pm_can_assign_user_to_task(): void
     {

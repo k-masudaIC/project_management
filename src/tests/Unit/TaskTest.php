@@ -3,11 +3,11 @@ namespace Tests\Unit;
 use App\Models\Task;
 use App\Models\Project;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
 class TaskTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
     public function test_task_belongs_to_project()
     {
         $project = Project::factory()->create();

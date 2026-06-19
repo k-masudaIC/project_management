@@ -70,7 +70,7 @@
         </div>
         <div>
             <label>表示順</label>
-            <input type="number" name="sort_order" class="border rounded px-2 py-1 w-full" value="{{ old('sort_order', $task->sort_order) }}">
+            <input type="number" name="sort_order" class="border rounded px-2 py-1 w-full" value="{{ old('sort_order', $task->sort_order ?? 0) }}">
         </div>
         <div>
             <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">更新</button>

@@ -20,6 +20,7 @@ class TimerController extends Controller
             'user_id' => Auth::id(),
             'work_date' => Carbon::now()->toDateString(),
             'hours' => 0,
+            'description' => $request->input('description'),
             'started_at' => Carbon::now(),
         ]);
         return response()->json(['id' => $entry->id, 'started_at' => $entry->started_at]);
@@ -31,9 +32,13 @@ class TimerController extends Controller
         if (!$timeEntry->started_at) {
             return response()->json(['error' => 'タイマーが開始されていません'], 400);
         }
+        $request->validate([
+            'description' => ['nullable', 'string'],
+        ]);
         $timeEntry->ended_at = Carbon::now();
         $diff = Carbon::parse($timeEntry->started_at)->diffInMinutes($timeEntry->ended_at) / 60;
         $timeEntry->hours = round($diff, 2);
+        $timeEntry->description = $request->input('description');
         $timeEntry->save();
         return response()->json(['id' => $timeEntry->id, 'ended_at' => $timeEntry->ended_at, 'hours' => $timeEntry->hours]);
     }

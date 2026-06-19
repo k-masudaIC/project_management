@@ -15,6 +15,7 @@ class StartTimerRequest extends FormRequest
     {
         return [
             'task_id' => ['required', 'exists:tasks,id'],
+            'description' => ['nullable', 'string'],
         ];
     }
 }

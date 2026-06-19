@@ -43,13 +43,18 @@ class TaskController extends Controller
         try {
             DB::transaction(function () use ($request) {
                 $data = $request->validated();
-                $data['created_by'] = auth()->id() ?? 1;
+                if (!isset($data['sort_order']) || $data['sort_order'] === null || $data['sort_order'] === '') {
+                    $data['sort_order'] = 0;
+                }
+                $data['created_by'] = auth()->id();
                 Task::create($data);
             });
             return redirect()->route('tasks.index')->with('success', 'タスクを登録しました');
         } catch (\Exception $e) {
             Log::error('Task create failed: ' . $e->getMessage(), ['exception' => $e]);
-            return back()->withErrors(['error' => 'タスクの作成に失敗しました。']);
+            return back()
+                ->withInput()
+                ->withErrors(['error' => 'タスクの作成に失敗しました。入力内容をご確認ください。']);
         }
     }
 
@@ -72,7 +77,11 @@ class TaskController extends Controller
     {
         try {
             DB::transaction(function () use ($request, $task) {
-                $task->update($request->validated());
+                $data = $request->validated();
+                if (!isset($data['sort_order']) || $data['sort_order'] === null || $data['sort_order'] === '') {
+                    $data['sort_order'] = 0;
+                }
+                $task->update($data);
 
                 // 担当者（assignees）更新処理
                 $assignees = $request->input('assignees', []);

@@ -3,11 +3,11 @@ namespace Tests\Unit;
 use App\Models\Project;
 use App\Models\Client;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
 class ProjectTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
     public function test_project_belongs_to_client()
     {
         $client = Client::factory()->create();

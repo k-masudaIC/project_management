@@ -5,12 +5,12 @@ namespace Tests\Unit;
 use App\Models\TimeEntry;
 use App\Models\Task;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
 
 class TimeEntryTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     public function test_time_entry_belongs_to_task()
     {

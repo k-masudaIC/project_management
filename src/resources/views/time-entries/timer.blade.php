@@ -14,6 +14,10 @@
                 @endforeach
             </select>
         </div>
+        <div class="mb-4">
+            <label class="block">内容</label>
+            <textarea name="description" id="description" class="border rounded w-full" rows="3" placeholder="作業内容を入力"></textarea>
+        </div>
         <button type="button" id="start-btn" class="bg-blue-500 text-white px-4 py-2 rounded">タイマー開始</button>
         <button type="button" id="stop-btn" class="bg-red-500 text-white px-4 py-2 rounded ml-2" disabled>タイマー停止</button>
         <div class="mt-4">
@@ -36,6 +40,7 @@ function formatTime(sec) {
 
 document.getElementById('start-btn').onclick = async function() {
     const taskId = document.getElementById('task_id').value;
+    const description = document.getElementById('description').value;
     if (!taskId) return alert('タスクを選択してください');
     const res = await fetch("{{ route('timer.start') }}", {
         method: 'POST',
@@ -43,7 +48,7 @@ document.getElementById('start-btn').onclick = async function() {
             'Content-Type': 'application/json',
             'X-CSRF-TOKEN': document.querySelector('input[name=_token]').value
         },
-        body: JSON.stringify({ task_id: taskId })
+        body: JSON.stringify({ task_id: taskId, description: description })
     });
     const data = await res.json();
     if (data.id) {
@@ -60,11 +65,14 @@ document.getElementById('start-btn').onclick = async function() {
 
 document.getElementById('stop-btn').onclick = async function() {
     if (!entryId) return;
+    const description = document.getElementById('description').value;
     const res = await fetch(`{{ url('/timer/stop') }}/${entryId}`, {
         method: 'POST',
         headers: {
+            'Content-Type': 'application/json',
             'X-CSRF-TOKEN': document.querySelector('input[name=_token]').value
-        }
+        },
+        body: JSON.stringify({ description: description })
     });
     const data = await res.json();
     clearInterval(timerId);
