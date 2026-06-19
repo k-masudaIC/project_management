@@ -52,4 +52,23 @@ class InvoiceController extends Controller
         return redirect()->route('invoices.index', ['month' => $month])
             ->with('success', sprintf('%s の請求書を %d 件発行しました。', $month, $invoices->count()));
     }
+
+    public function markPaid(Invoice $invoice)
+    {
+        $this->authorize('markPaid', Invoice::class);
+
+        $invoice->update([
+            'status' => 'paid',
+        ]);
+
+        return redirect()->route('invoices.show', $invoice)->with('success', '請求書を支払済みに更新しました。');
+    }
+
+    public function printable(Invoice $invoice)
+    {
+        $this->authorize('view', $invoice);
+        $invoice->load('user');
+
+        return view('invoices.printable', compact('invoice'));
+    }
 }

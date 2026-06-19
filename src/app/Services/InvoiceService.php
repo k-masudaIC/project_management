@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Invoice;
 use App\Models\TimeEntry;
 use App\Models\User;
+use App\Notifications\InvoiceIssuedNotification;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 
@@ -52,6 +53,10 @@ class InvoiceService
                     'auto_generated' => true,
                 ]
             );
+
+            if ($invoice->wasRecentlyCreated || $invoice->wasChanged(['total_hours', 'unit_rate', 'amount', 'status'])) {
+                $user->notify(new InvoiceIssuedNotification($invoice));
+            }
 
             return $invoice;
         });

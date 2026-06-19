@@ -3,6 +3,12 @@
 <div class="container mx-auto py-6">
     <h1 class="text-2xl font-bold mb-4">請求書詳細</h1>
 
+    @if(session('success'))
+        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-2 rounded mb-4">
+            {{ session('success') }}
+        </div>
+    @endif
+
     <div class="bg-white border rounded p-4 space-y-2">
         <div><span class="font-semibold">請求書番号:</span> {{ $invoice->invoice_number }}</div>
         <div><span class="font-semibold">対象月:</span> {{ $invoice->billing_month?->format('Y-m') }}</div>
@@ -21,6 +27,15 @@
     </div>
 
     <div class="mt-4">
+        <a href="{{ route('invoices.printable', $invoice) }}" target="_blank" class="bg-gray-700 text-white px-3 py-1 rounded">印刷 / PDF保存</a>
+        @can('markPaid', App\Models\Invoice::class)
+            @if($invoice->status !== 'paid')
+                <form action="{{ route('invoices.mark-paid', $invoice) }}" method="POST" class="inline ml-2">
+                    @csrf
+                    <button type="submit" class="bg-green-600 text-white px-3 py-1 rounded" onclick="return confirm('支払済みに更新しますか？')">支払済みに更新</button>
+                </form>
+            @endif
+        @endcan
         <a href="{{ route('invoices.index') }}" class="text-blue-600 underline">一覧へ戻る</a>
     </div>
 </div>

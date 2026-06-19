@@ -58,6 +58,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/invoices', [InvoiceController::class, 'index'])->name('invoices.index');
     Route::get('/invoices/{invoice}', [InvoiceController::class, 'show'])->name('invoices.show');
     Route::post('/invoices/generate-monthly', [InvoiceController::class, 'generateMonthly'])->name('invoices.generate-monthly');
+    Route::post('/invoices/{invoice}/mark-paid', [InvoiceController::class, 'markPaid'])->name('invoices.mark-paid');
+    Route::get('/invoices/{invoice}/printable', [InvoiceController::class, 'printable'])->name('invoices.printable');
 });
 
 // 案件管理・タスク管理（一覧・詳細は誰でも可、登録・編集・削除は認証ユーザーのみ）

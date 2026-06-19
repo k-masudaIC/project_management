@@ -66,4 +66,50 @@ class InvoiceTest extends TestCase
             ->get('/invoices/' . $others->id)
             ->assertForbidden();
     }
+
+    public function test_pm_can_mark_invoice_paid(): void
+    {
+        $pm = User::factory()->create(['role' => 'pm']);
+        $contractor = User::factory()->create(['role' => 'contractor']);
+
+        $invoice = Invoice::create([
+            'invoice_number' => 'INV-202606-0100',
+            'user_id' => $contractor->id,
+            'billing_month' => now()->startOfMonth()->toDateString(),
+            'total_hours' => 10,
+            'rate_type' => 'hourly',
+            'unit_rate' => 3000,
+            'amount' => 30000,
+            'status' => 'issued',
+        ]);
+
+        $this->actingAs($pm)
+            ->post('/invoices/' . $invoice->id . '/mark-paid')
+            ->assertRedirect();
+
+        $this->assertDatabaseHas('invoices', [
+            'id' => $invoice->id,
+            'status' => 'paid',
+        ]);
+    }
+
+    public function test_contractor_cannot_mark_invoice_paid(): void
+    {
+        $contractor = User::factory()->create(['role' => 'contractor']);
+
+        $invoice = Invoice::create([
+            'invoice_number' => 'INV-202606-0101',
+            'user_id' => $contractor->id,
+            'billing_month' => now()->startOfMonth()->toDateString(),
+            'total_hours' => 10,
+            'rate_type' => 'hourly',
+            'unit_rate' => 3000,
+            'amount' => 30000,
+            'status' => 'issued',
+        ]);
+
+        $this->actingAs($contractor)
+            ->post('/invoices/' . $invoice->id . '/mark-paid')
+            ->assertForbidden();
+    }
 }

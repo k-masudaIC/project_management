@@ -25,4 +25,9 @@ class InvoicePolicy
     {
         return in_array($user->role, ['admin', 'pm'], true);
     }
+
+    public function markPaid(User $user): bool
+    {
+        return in_array($user->role, ['admin', 'pm'], true);
+    }
 }
