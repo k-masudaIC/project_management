@@ -5,6 +5,9 @@
     <li><a href="/reports/monthly" class="text-blue-600 hover:underline">月次レポート</a></li>
     <li><a href="/reports/project" class="text-blue-600 hover:underline">案件別レポート</a></li>
     <li><a href="/reports/member" class="text-blue-600 hover:underline">メンバー別レポート</a></li>
-    <li><a href="/reports/export" class="text-blue-600 hover:underline">CSV/PDFエクスポート</a></li>
+    @can('export-report')
+    <li><a href="/reports/monthly?export=csv" class="text-blue-600 hover:underline">月次CSVエクスポート</a></li>
+    @endcan
+    <li><a href="/invoices" class="text-blue-600 hover:underline">請求書管理</a></li>
 </ul>
 @endsection

@@ -3,13 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ReportFilterRequest;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\View;
-use Illuminate\Support\Facades\Response;
-use App\Exports\ReportExport;
-use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\Auth;
 
@@ -17,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 class ReportController extends Controller
 {
     use AuthorizesRequests;
+
     public function monthly(ReportFilterRequest $request)
     {
         $this->authorize('view-report');
@@ -101,23 +95,91 @@ class ReportController extends Controller
     public function project(ReportFilterRequest $request)
     {
         $this->authorize('view-report');
-        // 案件別収支レポートロジック
-        return view('reports.project');
+
+        $month = $request->input('month');
+        $projectCode = $request->input('project_code');
+
+        $query = \App\Models\Project::query()->with(['client', 'tasks.timeEntries.user']);
+
+        if ($projectCode) {
+            $query->where('code', 'like', '%' . $projectCode . '%');
+        }
+
+        $rows = $query->get()->map(function ($project) use ($month) {
+            $entries = $project->tasks->flatMap->timeEntries;
+            if ($month) {
+                $from = $month . '-01';
+                $to = date('Y-m-t', strtotime($from));
+                $entries = $entries->filter(fn ($entry) => $entry->work_date >= $from && $entry->work_date <= $to);
+            }
+
+            $hours = (float) $entries->sum('hours');
+            $cost = $entries->sum(fn ($entry) => $this->entryCost($entry));
+            $budget = (float) ($project->budget ?? 0);
+            $balance = $budget - $cost;
+
+            return [
+                'project_code' => $project->code,
+                'project_name' => $project->name,
+                'budget' => $budget,
+                'actual_hours' => round($hours, 2),
+                'cost' => round($cost, 2),
+                'balance' => round($balance, 2),
+                'burn_rate' => $budget > 0 ? round(($cost / $budget) * 100, 1) : 0,
+            ];
+        });
+
+        if ($request->input('export') === 'csv') {
+            $this->authorize('export-report');
+            return $this->exportProjectCsv($rows, $month);
+        }
+
+        return view('reports.project', [
+            'reportRows' => $rows,
+            'selectedMonth' => $month,
+            'selectedProjectCode' => $projectCode,
+        ]);
     }
 
     public function member(ReportFilterRequest $request)
     {
         $this->authorize('view-report');
-        // メンバー別稼働率レポートロジック
-        return view('reports.member');
+
+        $month = $request->input('month', now()->format('Y-m'));
+        $from = $month . '-01';
+        $to = date('Y-m-t', strtotime($from));
+        $businessDays = now()->createFromFormat('Y-m', $month)->daysInMonth;
+        $standardHours = $businessDays * 8;
+
+        $users = \App\Models\User::where('is_active', true)->orderBy('name')->get();
+
+        $rows = $users->map(function ($user) use ($from, $to, $standardHours) {
+            $hours = (float) \App\Models\TimeEntry::where('user_id', $user->id)
+                ->whereBetween('work_date', [$from, $to])
+                ->sum('hours');
+
+            return [
+                'user_name' => $user->name,
+                'worked_hours' => round($hours, 2),
+                'utilization_rate' => $standardHours > 0 ? round(($hours / $standardHours) * 100, 1) : 0,
+            ];
+        });
+
+        if ($request->input('export') === 'csv') {
+            $this->authorize('export-report');
+            return $this->exportMemberCsv($rows, $month);
+        }
+
+        return view('reports.member', [
+            'reportRows' => $rows,
+            'selectedMonth' => $month,
+        ]);
     }
 
     public function export(ReportFilterRequest $request)
     {
         $this->authorize('export-report');
-        // CSV/PDFエクスポートロジック
-        // return Excel::download(new ReportExport($request->all()), 'report.csv');
-        return response()->json(['message' => 'エクスポート機能は未実装です']);
+        return redirect()->route('reports.monthly', ['export' => 'csv'] + $request->all());
     }
 
     private function entryCost($entry): float
@@ -164,6 +226,54 @@ class ReportController extends Controller
                     $row['project_name'],
                     number_format((float)$row['total_hours'], 2, '.', ''),
                     number_format((float)$row['total_cost'], 2, '.', ''),
+                ]);
+            }
+
+            fclose($handle);
+        }, $filename, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+        ]);
+    }
+
+    private function exportProjectCsv($rows, ?string $month)
+    {
+        $filename = 'project_report_' . ($month ?: now()->format('Y-m')) . '.csv';
+
+        return response()->streamDownload(function () use ($rows) {
+            $handle = fopen('php://output', 'w');
+            fputcsv($handle, ['案件コード', '案件名', '予算', '実績工数', '原価', '消化率(%)', '収支']);
+
+            foreach ($rows as $row) {
+                fputcsv($handle, [
+                    $row['project_code'],
+                    $row['project_name'],
+                    number_format((float)$row['budget'], 2, '.', ''),
+                    number_format((float)$row['actual_hours'], 2, '.', ''),
+                    number_format((float)$row['cost'], 2, '.', ''),
+                    number_format((float)$row['burn_rate'], 1, '.', ''),
+                    number_format((float)$row['balance'], 2, '.', ''),
+                ]);
+            }
+
+            fclose($handle);
+        }, $filename, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+        ]);
+    }
+
+    private function exportMemberCsv($rows, string $month)
+    {
+        $filename = 'member_report_' . $month . '.csv';
+
+        return response()->streamDownload(function () use ($rows) {
+            $handle = fopen('php://output', 'w');
+            fputcsv($handle, ['メンバー', '稼働時間', '稼働率(%)']);
+
+            foreach ($rows as $row) {
+                fputcsv($handle, [
+                    $row['user_name'],
+                    number_format((float)$row['worked_hours'], 2, '.', ''),
+                    number_format((float)$row['utilization_rate'], 1, '.', ''),
                 ]);
             }
 

@@ -9,6 +9,7 @@ use App\Http\Controllers\TaskController;
 use App\Http\Controllers\TaskAssignmentController;
 use App\Http\Controllers\TimeEntryController;
 use App\Http\Controllers\TimerController;
+use App\Http\Controllers\InvoiceController;
 
 // タイマー画面
 Route::middleware('auth')->get('/time-entries/timer', function () {
@@ -52,6 +53,11 @@ Route::middleware('auth')->group(function () {
     Route::delete('/task-assignments/{taskAssignment}', [TaskAssignmentController::class, 'destroy'])->name('task-assignments.destroy');
     // 工数記録
     Route::resource('time-entries', TimeEntryController::class);
+
+    // 請求書管理
+    Route::get('/invoices', [InvoiceController::class, 'index'])->name('invoices.index');
+    Route::get('/invoices/{invoice}', [InvoiceController::class, 'show'])->name('invoices.show');
+    Route::post('/invoices/generate-monthly', [InvoiceController::class, 'generateMonthly'])->name('invoices.generate-monthly');
 });
 
 // 案件管理・タスク管理（一覧・詳細は誰でも可、登録・編集・削除は認証ユーザーのみ）

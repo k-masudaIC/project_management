@@ -4,7 +4,8 @@
 <div class="container mx-auto py-6">
     <h1 class="text-2xl font-bold mb-4">案件別収支レポート</h1>
     <form method="GET" class="mb-4 flex gap-2">
-        <input type="text" name="project_code" value="{{ request('project_code') }}" class="border rounded px-2 py-1" placeholder="案件コード">
+        <input type="month" name="month" value="{{ $selectedMonth ?? request('month') }}" class="border rounded px-2 py-1">
+        <input type="text" name="project_code" value="{{ $selectedProjectCode ?? request('project_code') }}" class="border rounded px-2 py-1" placeholder="案件コード">
         <button type="submit" class="bg-blue-500 text-white px-4 py-1 rounded">検索</button>
     </form>
     <table class="min-w-full bg-white border">
@@ -19,21 +20,26 @@
             </tr>
         </thead>
         <tbody>
-            {{-- @foreach($reportRows as $row) --}}
+            @forelse($reportRows as $row)
             <tr>
-                <td class="border px-2 py-1">PRJ-2024-001</td>
-                <td class="border px-2 py-1">Webサイト制作</td>
-                <td class="border px-2 py-1 text-right">1,000,000</td>
-                <td class="border px-2 py-1 text-right">120.5</td>
-                <td class="border px-2 py-1 text-right">80%</td>
-                <td class="border px-2 py-1 text-right">+200,000</td>
+                <td class="border px-2 py-1">{{ $row['project_code'] }}</td>
+                <td class="border px-2 py-1">{{ $row['project_name'] }}</td>
+                <td class="border px-2 py-1 text-right">{{ number_format($row['budget'], 0) }}</td>
+                <td class="border px-2 py-1 text-right">{{ number_format($row['actual_hours'], 2) }}</td>
+                <td class="border px-2 py-1 text-right">{{ number_format($row['burn_rate'], 1) }}%</td>
+                <td class="border px-2 py-1 text-right">{{ number_format($row['balance'], 0) }}</td>
             </tr>
-            {{-- @endforeach --}}
+            @empty
+            <tr>
+                <td colspan="6" class="text-center text-gray-400">データがありません</td>
+            </tr>
+            @endforelse
         </tbody>
     </table>
     <div class="mt-4">
-        <a href="?export=csv" class="bg-green-500 text-white px-4 py-1 rounded">CSVエクスポート</a>
-        <a href="?export=pdf" class="bg-gray-700 text-white px-4 py-1 rounded ml-2">PDFエクスポート</a>
+        @can('export-report')
+        <a href="{{ route('reports.project', array_merge(request()->query(), ['export' => 'csv'])) }}" class="bg-green-500 text-white px-4 py-1 rounded">CSVエクスポート</a>
+        @endcan
     </div>
 </div>
 @endsection

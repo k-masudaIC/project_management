@@ -4,7 +4,7 @@
 <div class="container mx-auto py-6">
     <h1 class="text-2xl font-bold mb-4">メンバー別稼働率レポート</h1>
     <form method="GET" class="mb-4 flex gap-2">
-        <input type="month" name="month" value="{{ request('month', now()->format('Y-m')) }}" class="border rounded px-2 py-1">
+        <input type="month" name="month" value="{{ $selectedMonth ?? request('month', now()->format('Y-m')) }}" class="border rounded px-2 py-1">
         <button type="submit" class="bg-blue-500 text-white px-4 py-1 rounded">絞り込み</button>
     </form>
     <table class="min-w-full bg-white border">
@@ -16,18 +16,23 @@
             </tr>
         </thead>
         <tbody>
-            {{-- @foreach($reportRows as $row) --}}
+            @forelse($reportRows as $row)
             <tr>
-                <td class="border px-2 py-1">（例）山田太郎</td>
-                <td class="border px-2 py-1 text-right">160</td>
-                <td class="border px-2 py-1 text-right">80%</td>
+                <td class="border px-2 py-1">{{ $row['user_name'] }}</td>
+                <td class="border px-2 py-1 text-right">{{ number_format($row['worked_hours'], 2) }}</td>
+                <td class="border px-2 py-1 text-right">{{ number_format($row['utilization_rate'], 1) }}%</td>
             </tr>
-            {{-- @endforeach --}}
+            @empty
+            <tr>
+                <td colspan="3" class="text-center text-gray-400">データがありません</td>
+            </tr>
+            @endforelse
         </tbody>
     </table>
     <div class="mt-4">
-        <a href="?export=csv" class="bg-green-500 text-white px-4 py-1 rounded">CSVエクスポート</a>
-        <a href="?export=pdf" class="bg-gray-700 text-white px-4 py-1 rounded ml-2">PDFエクスポート</a>
+        @can('export-report')
+        <a href="{{ route('reports.member', array_merge(request()->query(), ['export' => 'csv'])) }}" class="bg-green-500 text-white px-4 py-1 rounded">CSVエクスポート</a>
+        @endcan
     </div>
 </div>
 @endsection

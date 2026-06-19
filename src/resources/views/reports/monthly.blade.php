@@ -69,8 +69,9 @@
         </tbody>
     </table>
     <div class="mt-4">
+        @can('export-report')
         <a href="{{ route('reports.monthly', array_merge(request()->query(), ['export' => 'csv'])) }}" class="bg-green-500 text-white px-4 py-1 rounded">CSVエクスポート</a>
-        <a href="?export=pdf" class="bg-gray-700 text-white px-4 py-1 rounded ml-2">PDFエクスポート</a>
+        @endcan
     </div>
 </div>
 @endsection

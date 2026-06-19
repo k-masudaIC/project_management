@@ -28,6 +28,7 @@
                 <option value="admin" @selected(old('role', $user->role) === 'admin')>管理者</option>
                 <option value="pm" @selected(old('role', $user->role) === 'pm')>PM</option>
                 <option value="member" @selected(old('role', $user->role) === 'member')>メンバー</option>
+                <option value="contractor" @selected(old('role', $user->role) === 'contractor')>業務委託</option>
             </select>
         </div>
         <div class="mb-4">

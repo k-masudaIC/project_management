@@ -7,6 +7,9 @@
         @if(Auth::user() && in_array(Auth::user()->role, ['admin', 'pm']))
             <li><a href="/reports" class="block px-3 py-2 rounded hover:bg-gray-200">レポート</a></li>
         @endif
+        @if(Auth::user() && in_array(Auth::user()->role, ['admin', 'pm', 'contractor']))
+            <li><a href="/invoices" class="block px-3 py-2 rounded hover:bg-gray-200">請求書管理</a></li>
+        @endif
         @if(Auth::user() && Auth::user()->role === 'admin')
             <li><a href="/settings" class="block px-3 py-2 rounded hover:bg-gray-200">設定</a></li>
         @endif

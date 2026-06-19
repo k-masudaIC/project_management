@@ -20,6 +20,7 @@ class AuthServiceProvider extends ServiceProvider
         \App\Models\Task::class => \App\Policies\TaskPolicy::class,
         \App\Models\TaskAssignment::class => \App\Policies\TaskAssignmentPolicy::class,
         \App\Models\TimeEntry::class => \App\Policies\TimeEntryPolicy::class,
+        \App\Models\Invoice::class => \App\Policies\InvoicePolicy::class,
     ];
 
     /**

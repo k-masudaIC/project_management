@@ -28,7 +28,7 @@ class ProjectController extends Controller
         $clients = $this->availableClients();
 
         $user = Auth::user();
-        if ($user && $user->role === 'member') {
+        if ($user && in_array($user->role, ['member', 'contractor'], true)) {
             $allowedClientIds = $clients->pluck('id');
             $query->whereIn('client_id', $allowedClientIds);
         }
@@ -108,7 +108,7 @@ class ProjectController extends Controller
     private function availableClients()
     {
         $user = Auth::user();
-        if ($user && $user->role === 'member') {
+        if ($user && in_array($user->role, ['member', 'contractor'], true)) {
             return $user->clients()->where('is_active', true)->orderBy('company_name')->get();
         }
 
@@ -118,7 +118,7 @@ class ProjectController extends Controller
     private function canUseClient(int $clientId): bool
     {
         $user = Auth::user();
-        if (!$user || $user->role !== 'member') {
+        if (!$user || !in_array($user->role, ['member', 'contractor'], true)) {
             return true;
         }
 

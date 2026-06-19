@@ -15,6 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ])
     ->withSchedule(function (Illuminate\Console\Scheduling\Schedule $schedule) {
         $schedule->command('tasks:send-deadline-alerts')->hourly();
+        $schedule->command('invoices:generate-monthly')->monthlyOn(1, '01:00');
     })
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->validateCsrfTokens(except: [

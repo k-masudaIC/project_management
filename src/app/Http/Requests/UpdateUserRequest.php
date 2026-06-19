@@ -18,7 +18,7 @@ class UpdateUserRequest extends FormRequest
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $userId,
             'password' => 'nullable|string|min:8|confirmed',
-            'role' => 'required|in:admin,pm,member',
+            'role' => 'required|in:admin,pm,member,contractor',
             'rate_type' => 'required|in:hourly,daily',
             'hourly_rate' => 'nullable|numeric|min:0|required_if:rate_type,hourly',
             'daily_rate' => 'nullable|numeric|min:0|required_if:rate_type,daily',
