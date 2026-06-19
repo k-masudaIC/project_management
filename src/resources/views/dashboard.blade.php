@@ -174,7 +174,7 @@
                                             <tr>
                                                 <td class="border px-2 py-1">{{ $project['code'] }}</td>
                                                 <td class="border px-2 py-1">{{ $project['name'] }}</td>
-                                                <td class="border px-2 py-1">{{ __(ucfirst(str_replace('_', ' ', $project['status']))) }}</td>
+                                                <td class="border px-2 py-1">{{ $project['status_label'] }}</td>
                                                 <td class="border px-2 py-1">{{ $project['end_date'] ? \Carbon\Carbon::parse($project['end_date'])->format('Y-m-d') : '-' }}</td>
                                                 <td class="border px-2 py-1">{{ $project['progress'] }}%</td>
                                             </tr>

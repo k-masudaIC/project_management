@@ -56,6 +56,7 @@ class DashboardController extends Controller
                 'name' => $project->name,
                 'code' => $project->code,
                 'status' => $project->status,
+                'status_label' => $project->status_label,
                 'end_date' => $project->end_date,
                 'progress' => $progress,
             ];

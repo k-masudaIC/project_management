@@ -27,4 +27,16 @@ class Project extends Model
     {
         return $this->hasMany(Task::class);
     }
+
+    public function getStatusLabelAttribute(): string
+    {
+        return match ($this->status) {
+            'proposal' => '提案中',
+            'in_progress' => '進行中',
+            'on_hold' => '保留',
+            'completed' => '完了',
+            'cancelled' => 'キャンセル',
+            default => $this->status,
+        };
+    }
 }

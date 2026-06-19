@@ -7,7 +7,7 @@
             <dt>案件コード</dt><dd>{{ $project->code }}</dd>
             <dt>案件名</dt><dd>{{ $project->name }}</dd>
             <dt>クライアント</dt><dd>{{ $project->client->company_name ?? '' }}</dd>
-            <dt>ステータス</dt><dd>{{ $project->status }}</dd>
+            <dt>ステータス</dt><dd>{{ $project->status_label }}</dd>
             <dt>予算</dt><dd>{{ number_format($project->budget) }}</dd>
             <dt>見積工数</dt><dd>{{ $project->estimated_hours }}</dd>
             <dt>開始日</dt><dd>{{ $project->start_date }}</dd>

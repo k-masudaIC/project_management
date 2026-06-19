@@ -41,7 +41,7 @@
                     <td class="border px-2 py-1">{{ $project->code }}</td>
                 <td class="border px-2 py-1">{{ $project->name }}</td>
                 <td class="border px-2 py-1">{{ $project->client->company_name ?? '' }}</td>
-                <td class="border px-2 py-1">{{ $project->status }}</td>
+                <td class="border px-2 py-1">{{ $project->status_label }}</td>
                 <td class="border px-2 py-1 text-right">{{ number_format($project->budget) }}</td>
                 <td class="border px-2 py-1">{{ $project->end_date }}</td>
                 <td class="border px-2 py-1">
