@@ -18,9 +18,13 @@ class StoreUserRequest extends FormRequest
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:8|confirmed',
             'role' => 'required|in:admin,pm,member',
-            'hourly_rate' => 'nullable|numeric',
+            'rate_type' => 'required|in:hourly,daily',
+            'hourly_rate' => 'nullable|numeric|min:0|required_if:rate_type,hourly',
+            'daily_rate' => 'nullable|numeric|min:0|required_if:rate_type,daily',
             'avatar' => 'nullable|string',
             'is_active' => 'boolean',
+            'client_ids' => 'nullable|array',
+            'client_ids.*' => 'exists:clients,id',
         ];
     }
 }

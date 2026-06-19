@@ -23,6 +23,10 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'rate_type',
+        'hourly_rate',
+        'daily_rate',
+        'avatar',
         'is_active',
     ];
 
@@ -47,6 +51,8 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'is_active' => 'boolean',
             'role' => 'string',
+            'hourly_rate' => 'decimal:2',
+            'daily_rate' => 'decimal:2',
         ];
     }
 
@@ -58,5 +64,10 @@ class User extends Authenticatable
     public function timeEntries()
     {
         return $this->hasMany(TimeEntry::class);
+    }
+
+    public function clients()
+    {
+        return $this->belongsToMany(Client::class)->withTimestamps();
     }
 }

@@ -18,7 +18,7 @@
             <select name="client_id" class="border rounded px-2 py-1 w-full" required>
                 <option value="">選択してください</option>
                 @foreach($clients as $client)
-                    <option value="{{ $client->id }}" @if($project->client_id == $client->id) selected @endif>{{ $client->company_name }}</option>
+                    <option value="{{ $client->id }}" @selected(old('client_id', $project->client_id) == $client->id)>{{ $client->company_name }}</option>
                 @endforeach
             </select>
         </div>

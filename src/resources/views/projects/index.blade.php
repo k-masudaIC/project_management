@@ -5,16 +5,16 @@
     <form method="GET" class="mb-4 flex gap-4">
         <select name="status" class="border rounded px-2 py-1">
             <option value="">ステータス</option>
-            <option value="proposal">提案中</option>
-            <option value="in_progress">進行中</option>
-            <option value="on_hold">保留</option>
-            <option value="completed">完了</option>
-            <option value="cancelled">キャンセル</option>
+            <option value="proposal" @selected(request('status') === 'proposal')>提案中</option>
+            <option value="in_progress" @selected(request('status') === 'in_progress')>進行中</option>
+            <option value="on_hold" @selected(request('status') === 'on_hold')>保留</option>
+            <option value="completed" @selected(request('status') === 'completed')>完了</option>
+            <option value="cancelled" @selected(request('status') === 'cancelled')>キャンセル</option>
         </select>
         <select name="client_id" class="border rounded px-2 py-1">
             <option value="">クライアント</option>
             @foreach($clients as $client)
-                <option value="{{ $client->id }}">{{ $client->company_name }}</option>
+                <option value="{{ $client->id }}" @selected((string)request('client_id') === (string)$client->id)>{{ $client->company_name }}</option>
             @endforeach
         </select>
         <button type="submit" class="bg-blue-500 text-white px-4 py-1 rounded">絞り込み</button>

@@ -26,4 +26,9 @@ class Client extends Model
     {
         return $this->hasMany(Project::class);
     }
+
+    public function users()
+    {
+        return $this->belongsToMany(User::class)->withTimestamps();
+    }
 }

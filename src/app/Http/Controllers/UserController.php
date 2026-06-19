@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Client;
 use Illuminate\Http\Request;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
@@ -20,15 +21,20 @@ class UserController extends Controller
 
     public function create()
     {
-        return view('users.create');
+        $clients = Client::where('is_active', true)->orderBy('company_name')->get();
+        return view('users.create', compact('clients'));
     }
 
     public function store(StoreUserRequest $request)
     {
         try {
             $data = $request->validated();
+            $clientIds = $data['client_ids'] ?? [];
+            unset($data['client_ids']);
             $data['password'] = Hash::make($data['password']);
-            User::create($data);
+            $data['is_active'] = $request->boolean('is_active');
+            $user = User::create($data);
+            $user->clients()->sync($clientIds);
             return redirect()->route('users.index')->with('success', 'ユーザーを作成しました');
         } catch (\Exception $e) {
             Log::error('User create failed: ' . $e->getMessage(), ['exception' => $e]);
@@ -38,19 +44,24 @@ class UserController extends Controller
 
     public function edit(User $user)
     {
-        return view('users.edit', compact('user'));
+        $clients = Client::where('is_active', true)->orderBy('company_name')->get();
+        return view('users.edit', compact('user', 'clients'));
     }
 
     public function update(UpdateUserRequest $request, User $user)
     {
         try {
             $data = $request->validated();
+            $clientIds = $data['client_ids'] ?? [];
+            unset($data['client_ids']);
             if (!empty($data['password'])) {
                 $data['password'] = Hash::make($data['password']);
             } else {
                 unset($data['password']);
             }
+            $data['is_active'] = $request->boolean('is_active');
             $user->update($data);
+            $user->clients()->sync($clientIds);
             return redirect()->route('users.index')->with('success', 'ユーザー情報を更新しました');
         } catch (\Exception $e) {
             Log::error('User update failed: ' . $e->getMessage(), ['exception' => $e]);

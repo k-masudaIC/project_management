@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 
 
 class ProjectController extends Controller
@@ -24,6 +25,14 @@ class ProjectController extends Controller
     public function index(Request $request)
     {
         $query = Project::with(['client', 'creator']);
+        $clients = $this->availableClients();
+
+        $user = Auth::user();
+        if ($user && $user->role === 'member') {
+            $allowedClientIds = $clients->pluck('id');
+            $query->whereIn('client_id', $allowedClientIds);
+        }
+
         if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
@@ -31,22 +40,26 @@ class ProjectController extends Controller
             $query->where('client_id', $request->client_id);
         }
         $projects = $query->orderByDesc('created_at')->paginate(20);
-        $clients = Client::all();
         return view('projects.index', compact('projects', 'clients'));
     }
 
     public function create()
     {
-        $clients = Client::all();
+        $clients = $this->availableClients();
         return view('projects.create', compact('clients'));
     }
 
     public function store(StoreProjectRequest $request)
     {
+        $validated = $request->validated();
+        if (!$this->canUseClient((int) $validated['client_id'])) {
+            return back()->withInput()->withErrors(['client_id' => '担当クライアントのみ選択できます。']);
+        }
+
         try {
-            DB::transaction(function () use ($request) {
-                $data = $request->validated();
-                $data['created_by'] = auth()->id() ?? 1; // 認証なし時は仮で1
+            DB::transaction(function () use ($validated) {
+                $data = $validated;
+                $data['created_by'] = auth()->id();
                 Project::create($data);
             });
             return redirect()->route('projects.index')->with('success', '案件を登録しました');
@@ -64,21 +77,52 @@ class ProjectController extends Controller
 
     public function edit(Project $project)
     {
-        $clients = Client::all();
+        $clients = $this->availableClients();
+
+        if (!$clients->pluck('id')->contains($project->client_id)) {
+            $clients->push($project->client);
+        }
+
         return view('projects.edit', compact('project', 'clients'));
     }
 
     public function update(StoreProjectRequest $request, Project $project)
     {
+        $validated = $request->validated();
+        if (!$this->canUseClient((int) $validated['client_id'])) {
+            return back()->withInput()->withErrors(['client_id' => '担当クライアントのみ選択できます。']);
+        }
+
         try {
-            DB::transaction(function () use ($request, $project) {
-                $project->update($request->validated());
+            DB::transaction(function () use ($validated, $project) {
+                $data = $validated;
+                $project->update($data);
             });
             return redirect()->route('projects.index')->with('success', '案件情報を更新しました');
         } catch (\Exception $e) {
             Log::error('Project update failed: ' . $e->getMessage(), ['exception' => $e]);
             return back()->withErrors(['error' => '案件の更新に失敗しました。']);
         }
+    }
+
+    private function availableClients()
+    {
+        $user = Auth::user();
+        if ($user && $user->role === 'member') {
+            return $user->clients()->where('is_active', true)->orderBy('company_name')->get();
+        }
+
+        return Client::where('is_active', true)->orderBy('company_name')->get();
+    }
+
+    private function canUseClient(int $clientId): bool
+    {
+        $user = Auth::user();
+        if (!$user || $user->role !== 'member') {
+            return true;
+        }
+
+        return $user->clients()->where('clients.id', $clientId)->exists();
     }
 
     public function destroy(Project $project)
