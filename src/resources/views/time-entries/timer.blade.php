@@ -6,8 +6,13 @@
     <form id="timer-form" class="mb-4">
         @csrf
         <div class="mb-4">
-            <label class="block">タスクID</label>
-            <input type="number" name="task_id" id="task_id" class="border rounded w-full" required>
+            <label class="block">タスク</label>
+            <select name="task_id" id="task_id" class="border rounded w-full" required>
+                <option value="">タスクを選択</option>
+                @foreach($tasks as $task)
+                    <option value="{{ $task->id }}">{{ $task->title }}（{{ $task->project->name ?? '案件未設定' }}）</option>
+                @endforeach
+            </select>
         </div>
         <button type="button" id="start-btn" class="bg-blue-500 text-white px-4 py-2 rounded">タイマー開始</button>
         <button type="button" id="stop-btn" class="bg-red-500 text-white px-4 py-2 rounded ml-2" disabled>タイマー停止</button>
@@ -31,7 +36,7 @@ function formatTime(sec) {
 
 document.getElementById('start-btn').onclick = async function() {
     const taskId = document.getElementById('task_id').value;
-    if (!taskId) return alert('タスクIDを入力してください');
+    if (!taskId) return alert('タスクを選択してください');
     const res = await fetch("{{ route('timer.start') }}", {
         method: 'POST',
         headers: {

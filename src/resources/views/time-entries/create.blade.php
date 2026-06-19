@@ -20,8 +20,15 @@
         @endif
         @csrf
         <div class="mb-4">
-            <label class="block">タスクID</label>
-            <input type="number" name="task_id" class="border rounded w-full" value="{{ old('task_id') }}" required placeholder="例：101">
+            <label class="block">タスク</label>
+            <select name="task_id" class="border rounded w-full" required>
+                <option value="">タスクを選択</option>
+                @foreach($tasks as $task)
+                    <option value="{{ $task->id }}" @selected(old('task_id') == $task->id)>
+                        {{ $task->title }}（{{ $task->project->name ?? '案件未設定' }}）
+                    </option>
+                @endforeach
+            </select>
         </div>
         <div class="mb-4">
             <label class="block">作業時間 (h)</label>

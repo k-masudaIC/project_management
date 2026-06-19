@@ -24,7 +24,14 @@
                 @endforeach
             </datalist>
             <input type="hidden" name="user_id" id="user_id_hidden" value="{{ request('user_id') }}">
-            <input type="text" name="task_id" value="{{ request('task_id') }}" class="border rounded px-2 py-1" placeholder="タスクID">
+            <select name="task_id" class="border rounded px-2 py-1">
+                <option value="">タスク（全て）</option>
+                @foreach($tasks as $task)
+                    <option value="{{ $task->id }}" @selected((string)request('task_id') === (string)$task->id)>
+                        {{ $task->title }}（{{ $task->project->name ?? '案件未設定' }}）
+                    </option>
+                @endforeach
+            </select>
             <button type="submit" class="bg-gray-400 text-white px-2 py-1 rounded">絞り込み</button>
             <script src="/resources/js/user_suggest.js"></script>
             <script>

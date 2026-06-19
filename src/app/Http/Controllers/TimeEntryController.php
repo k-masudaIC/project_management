@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Task;
 
 class TimeEntryController extends Controller
 {
@@ -27,14 +28,15 @@ class TimeEntryController extends Controller
         if ($userId) {
             $query->where('user_id', $userId);
         }
-        if ($request->has('task_id')) {
+        if ($request->filled('task_id')) {
             $query->where('task_id', $request->task_id);
         }
-        if ($request->has('work_date')) {
+        if ($request->filled('work_date')) {
             $query->where('work_date', $request->work_date);
         }
         $timeEntries = $query->orderByDesc('work_date')->paginate(20);
-        return view('time-entries.index', compact('timeEntries'));
+        $tasks = Task::with('project')->orderBy('title')->get();
+        return view('time-entries.index', compact('timeEntries', 'tasks'));
     }
 
 
@@ -57,7 +59,8 @@ class TimeEntryController extends Controller
     public function create()
     {
         $this->authorize("create", TimeEntry::class);
-        return view("time-entries.create");
+        $tasks = Task::with('project')->orderBy('title')->get();
+        return view("time-entries.create", compact('tasks'));
     }
 
     public function store(StoreTimeEntryRequest $request)
@@ -83,7 +86,8 @@ class TimeEntryController extends Controller
     public function edit(TimeEntry $timeEntry)
     {
         $this->authorize('update', $timeEntry);
-        return view('time-entries.edit', compact('timeEntry'));
+        $tasks = Task::with('project')->orderBy('title')->get();
+        return view('time-entries.edit', compact('timeEntry', 'tasks'));
     }
 
     public function update(StoreTimeEntryRequest $request, TimeEntry $timeEntry)

@@ -12,7 +12,8 @@ use App\Http\Controllers\TimerController;
 
 // タイマー画面
 Route::middleware('auth')->get('/time-entries/timer', function () {
-    return view('time-entries.timer');
+    $tasks = \App\Models\Task::with('project')->orderBy('title')->get();
+    return view('time-entries.timer', compact('tasks'));
 })->name('time-entries.timer');
 
 // タイマー機能
